@@ -1,3 +1,12 @@
+import '@/app/ui/global.css';
+import { Inter, Lusitana } from 'next/font/google';
+ 
+export const inter = Inter({ subsets: ['latin'] });
+export const lusitana = Lusitana({
+  subsets: ['latin'],
+  weight: ['400', '700']
+});
+
 export default function RootLayout({
   children,
 }: {
@@ -5,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${inter.className} antialiased`}>{children}</body>
     </html>
   );
 }
