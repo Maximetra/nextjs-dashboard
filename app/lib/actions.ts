@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
 import postgres from 'postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -120,4 +121,54 @@ export async function authenticate(
     }
     throw error;
   }
+}
+
+const FormSchemaUser = z.object({
+  id: z.string(),
+  name: z.string().min(2, { message: "Name must be 2 or more characters long" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(6, { message: "Password must be 6 or more characters long" }),
+});
+
+const CreateUser = FormSchemaUser.omit({ id: true });
+
+export type StateUser = {
+  errors?: {
+    name?: string[];
+    email?: string[];
+    password?: string[];
+  };
+  message?: string | null;
+};
+
+
+export async function createUser(prevState: StateUser, formData: FormData) {
+  const validatedFields = CreateUser.safeParse({
+    name: formData.get('name'),
+    email: formData.get('email'),
+    password: formData.get('password'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create User.',
+    };
+  }
+
+  const { name, email, password } = validatedFields.data;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const id = crypto.randomUUID();
+
+  try {
+    await sql`
+    INSERT INTO users (id, name, email, password)
+    VALUES (${id}, ${name}, ${email}, ${hashedPassword})
+    `;
+  } catch (error) {
+    console.error(error);
+  }
+
+    revalidatePath('/login');
+    redirect('/login');
 }

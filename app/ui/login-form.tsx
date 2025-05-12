@@ -11,6 +11,7 @@ import { lusitana } from '../font';
 import { useSearchParams } from 'next/navigation';
 import { useActionState } from 'react';
 import { authenticate } from '../lib/actions';
+import Link from 'next/link';
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
@@ -78,6 +79,9 @@ export default function LoginForm() {
               <p className="text-sm text-red-500">{errorMessage}</p>
             </>
           )}
+        </div>
+        <div className="text-sm">No account yet? 
+          <Link className="ms-1 text-blue-500" href="/register">Register Here</Link>
         </div>
       </div>
     </form>
