@@ -18,6 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <link rel="shortcut icon" href="maxime_profile.jpeg" type="image/x-icon" />
       <body className={`${inter.className} antialiased`}>{children}</body>
     </html>
   );
